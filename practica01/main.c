@@ -1,15 +1,50 @@
-#include <stdio.h>
-#include <string.h>
+#include "include.h"
 
-void hex_to_ascii(char c[]);
+void print_cmsgs(unsigned char c[MSGS][LEN], int len) {
+    int i, j;
 
-void hex_to_ascii(char c[]) {
-    
+    for (i = 0; i < MSGS; i++) {
+        printf("C%d: ", i);
+        for (j = 0; j < len; j++) {
+            printf("%c",  c[i][j]);
+        }
+        printf("\n");
+    }
+}
+
+void hex_to_ascii(unsigned char c[LEN], unsigned char aux[LEN], int len) {
+    int i, j;
+    unsigned char b1, b2;
+    // a = 87 y 0 = 48/
+    i = 0;
+    for (j = 0; j < len; j += 2) {
+        b1 = c[j];
+        b2 = c[j+1];
+        if (b1 >= 48 && b1 <= 57) {
+            b1 = b1-48;
+        } else {
+            b1 = b1-87;
+        }
+        if (b2 >= 48 && b2 <= 57) {
+            b2 = b2-48;
+        } else {
+            b2 = b2-87;
+        }
+        aux[i] = b1*16+b2;
+        if (aux[i] == '\n' || aux[i] == '\r') {
+            aux[i] = '/';
+        }
+        i++;
+        printf("%c", b1*16+b2);
+    }
+    aux[i] = '\0';
 }
 
 int main() {
 
-    char c[14][1000] = {"1a1617451a411517490b061b0f08535404044e17450c1c45326222420a00340006544816170b54030b55020d530046",
+    int i, j;
+    unsigned char mykey[10] = "abcdefghij";   
+    unsigned char c[MSGS][LEN] = {"1a1617451a411517490b061b0f08535404044e17450c1c45326222420a00340006544816170b54030b55020d530046",
         "184f184f0a081a000016071a00010017090b00100416010054530e060c52301b0c000a131304430e0a0640",
         "09001a5248041b04490a4f060b07550601115953150c010007000604134f2b4f01481a0417115348",
         "7926114506151f1159461b1d0b025454010850120617014542104b08104c35061a4e48201b00520f0c1400170e",
@@ -23,8 +58,16 @@ int main() {
         "163b55530d020317491216551e1645070d0b54004502520b11574b161c54790013000b0917094c0301120b170e",
         "100021000c04000c43031c550d054e54010b43010002010054530e060c52301b0c001e141a0b45140e17070849000100535d",
         "793b1d451a04560c53460e550d1d42111a4553160616000c00594b161249350306001b0919175407081040"};
+    unsigned char aux[MSGS][LEN];
+    int len;
 
+    print_cmsgs(c, LEN);
+    for (i = 0; i < MSGS; i++) {
+        printf("\nM%d: ", i);
+        len = strlen(c[i]);
+        hex_to_ascii(c[i], aux[i], len);
+    }
+    print_cmsgs(aux, len);
 
     return 0;
 }
-
