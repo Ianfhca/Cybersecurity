@@ -1,12 +1,25 @@
 #include "include.h"
 
-void print_cmsgs(unsigned char c[MSGS][LEN], int len) {
+void print_cmsgs(unsigned char c[MSGS][LEN]) {
     int i, j;
 
     for (i = 0; i < MSGS; i++) {
         printf("C%d: ", i);
-        for (j = 0; j < len; j++) {
+        for (j = 0; j < LEN; j++) {
             printf("%c",  c[i][j]);
+        }
+        printf("\n");
+    }
+}
+
+void print_hex(unsigned char c[MSGS][LEN]) {
+    int i, j, len;
+
+    for (i = 0; i < MSGS; i++) {
+        printf("C%d: ", i);
+        len = strlen(c[i]);
+        for (j = 0; j < len; j++) {
+            printf("%x",  c[i][j]);
         }
         printf("\n");
     }
@@ -30,12 +43,9 @@ void hex_to_ascii(unsigned char c[LEN], unsigned char aux[LEN], int len) {
         } else {
             b2 = b2-87;
         }
-        aux[i] = b1*16+b2;
-        if (aux[i] == '\n' || aux[i] == '\r') {
-            aux[i] = '/';
-        }
+        aux[j/2] = b1*16+b2;
         i++;
-        printf("%c", b1*16+b2);
+        printf("%x", b1*16+b2);
     }
     aux[i] = '\0';
 }
@@ -61,13 +71,14 @@ int main() {
     unsigned char aux[MSGS][LEN];
     int len;
 
-    print_cmsgs(c, LEN);
+    print_cmsgs(c);
     for (i = 0; i < MSGS; i++) {
         printf("\nM%d: ", i);
         len = strlen(c[i]);
         hex_to_ascii(c[i], aux[i], len);
     }
-    print_cmsgs(aux, len);
+    printf("\n");
+    print_hex(aux);
 
     return 0;
 }
