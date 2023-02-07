@@ -12,16 +12,11 @@ void print_cmsgs(unsigned char c[MSGS][LEN]) {
     }
 }
 
-void print_hex(unsigned char c[MSGS][LEN]) {
-    int i, j, len;
+void print_hex(unsigned char c[LEN], int len) {
+    int j;
 
-    for (i = 0; i < MSGS; i++) {
-        printf("C%d: ", i);
-        len = strlen(c[i]);
-        for (j = 0; j < len; j++) {
-            printf("%x",  c[i][j]);
-        }
-        printf("\n");
+    for (j = 0; j < len; j++) {
+        printf("%x",  c[j]);
     }
 }
 
@@ -43,11 +38,11 @@ void hex_to_ascii(unsigned char c[LEN], unsigned char aux[LEN], int len) {
         } else {
             b2 = b2-87;
         }
-        aux[j/2] = b1*16+b2;
+        aux[i] = b1*16+b2;
         i++;
-        printf("%x", b1*16+b2);
+        printf("%02x", b1*16+b2);
     }
-    aux[i] = '\0';
+    aux[i] = '\00';
 }
 
 int main() {
@@ -67,9 +62,11 @@ int main() {
         "793b024f48151f0845461f140a444907480b4f074510170601520e4959552a0a5541480f1312000d0a0c4e0141170045541a08065c",
         "163b55530d020317491216551e1645070d0b54004502520b11574b161c54790013000b0917094c0301120b170e",
         "100021000c04000c43031c550d054e54010b43010002010054530e060c52301b0c001e141a0b45140e17070849000100535d",
-        "793b1d451a04560c53460e550d1d42111a4553160616000c00594b161249350306001b0919175407081040"};
+        "00000000000000000000000000000000000000000000000000000000000000000000"};
+        // "793b1d451a04560c53460e550d1d42111a4553160616000c00594b161249350306001b0919175407081040"};
     unsigned char aux[MSGS][LEN];
     int len;
+    
 
     print_cmsgs(c);
     for (i = 0; i < MSGS; i++) {
@@ -78,7 +75,12 @@ int main() {
         hex_to_ascii(c[i], aux[i], len);
     }
     printf("\n");
-    print_hex(aux);
+    for (i = 0; i < MSGS; i++) {
+        printf("C%d: ", i);
+        len = strlen(c[i]);
+        print_hex(aux[i], len);
+        printf("\n");
+    }
 
     return 0;
 }
