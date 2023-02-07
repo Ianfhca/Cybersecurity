@@ -1,4 +1,6 @@
 #include "include.h"
+#include <ctype.h>
+#include <string.h>
 
 void print_cmsgs(unsigned char c[MSGS][LEN]) {
     int i, j;
@@ -45,10 +47,45 @@ void hex_to_ascii(unsigned char c[LEN], unsigned char aux[LEN], int len) {
     aux[i] = '\00';
 }
 
+//mira si hay espacio entre los mensajes
+void tabla_mensajes(unsigned char m1[10], unsigned char m2[10], int len){
+    char b;
+    char v_aux[LEN]; //CREAMOS el vector con las uniones de m1 y m2
+    for(int i=0; i<len; i++){
+        //for(int ji=0; j<m2; j++){
+            if(m1[i] == 32 || m2[i]!= 32){ //el primero es espacio y el segundo no
+                //miramos si es minuscula o mayuscula
+                if(m2[i]>=65 || m2[i]<=90){//MAYÚSCULA
+                    b = toupper(m2[i]);
+                    v_aux[i] = b;
+                }else if(m2[i]>=97 || m2[i]<=122){ //es minúscula
+                    b = tolower(m2[i]);
+                }
+            }else if(m1[i]!= 32 || m2[i] == 32){ //el segundo es espacio y el primero no
+                if(m1[i]>=65 || m1[i]<=90){//MAYÚSCULA
+                    b = toupper(m1[i]);
+                    v_aux[i] = b;
+                }else if(m1[i]>=97 || m1[i]<=122){ //es minúscula
+                    b = tolower(m1[i]);
+                }
+            }else{ //ninguno de los dos es espacio
+                b = "NA";
+                v_aux[i] = b;
+            }
+        }
+        printf(v_aux);
+
+    }
+//}
+
 int main() {
 
     int i, j;
-    unsigned char mykey[10] = "abcdefghij";   
+    unsigned char mykey[10] = "abcdefghij"; 
+
+    unsigned char mifrase1[10] = "kaixo libe";  
+    unsigned char mifrase2[10] = "aB cd ef g";
+
     unsigned char c[MSGS][LEN] = {"1a1617451a411517490b061b0f08535404044e17450c1c45326222420a00340006544816170b54030b55020d530046",
         "184f184f0a081a000016071a00010017090b00100416010054530e060c52301b0c000a131304430e0a0640",
         "09001a5248041b04490a4f060b07550601115953150c010007000604134f2b4f01481a0417115348",
@@ -81,6 +118,12 @@ int main() {
         print_hex(aux[i], len);
         printf("\n");
     }
+    
+    printf("\n");
+    printf(mifrase1);
+    printf("\n");
+    printf(mifrase2);
+    tabla_mensajes(mifrase1, mifrase2, 10);
 
     return 0;
 }
