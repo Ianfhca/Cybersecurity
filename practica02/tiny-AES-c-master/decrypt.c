@@ -88,6 +88,20 @@ uint32_t parse_mask(uint8_t *in, int64_t **key_mask){
 void search(int64_t n_key_mask, int64_t *key_mask, int64_t n_plaintext_mask, int64_t *plaintext_mask, uint8_t *key, uint8_t *plain_text, uint8_t *cypher_text)
 {	
 	//RELLENA EL CODIGO
+    struct AES_ctx ctx;
+
+    AES_init_ctx_iv(&ctx, key, iv); // Inicializa la clave con su IV
+    AES_CBC_encrypt_buffer(&ctx, plain_text, BLOCK_SIZE); // Encripta el texto usando CBC
+
+    printf("CBC encrypt: ");
+
+    // Comparamos el mensaje que ya teníamos cifrado con el que acabamos de cifrar
+    if (0 == memcmp((char*) cypher_text, (char*) plain_text, BLOCK_SIZE)) {
+        printf("SUCCESS: ");
+    } else {
+        printf("FAILURE!\n");
+    }
+    print_hex(plain_text, BLOCK_SIZE);
 }
 
 int main(int argc, char *argv[])
@@ -133,7 +147,6 @@ int main(int argc, char *argv[])
     printf("Plaintext mask length: %ld\n", n_plaintext_mask);
 
     search(n_key_mask, key_mask, n_plaintext_mask, plaintext_mask, key, plain_text, cypher_text);
-	
 }
 
 
