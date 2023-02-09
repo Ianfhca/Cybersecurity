@@ -1,6 +1,6 @@
 #include "include.h"
-#include <ctype.h>
-#include <string.h>
+#include "ctype.h"
+#include "string.h"
 
 void print_cmsgs(unsigned char c[MSGS][LEN]) {
     int i, j;
@@ -18,7 +18,7 @@ void print_hex(unsigned char c[LEN], int len) {
     int j;
 
     for (j = 0; j < len; j++) {
-        printf("%x",  c[j]);
+        printf("%x", c[j]);
     }
 }
 
@@ -50,41 +50,67 @@ void hex_to_ascii(unsigned char c[LEN], unsigned char aux[LEN], int len) {
 //mira si hay espacio entre los mensajes
 void tabla_mensajes(unsigned char m1[10], unsigned char m2[10], int len){
     char b;
-    char v_aux[LEN]; //CREAMOS el vector con las uniones de m1 y m2
-    for(int i=0; i<len; i++){
-        //for(int ji=0; j<m2; j++){
-            if(m1[i] == 32 || m2[i]!= 32){ //el primero es espacio y el segundo no
-                //miramos si es minuscula o mayuscula
-                if(m2[i]>=65 || m2[i]<=90){//MAYÚSCULA
-                    b = toupper(m2[i]);
-                    v_aux[i] = b;
-                }else if(m2[i]>=97 || m2[i]<=122){ //es minúscula
-                    b = tolower(m2[i]);
-                }
-            }else if(m1[i]!= 32 || m2[i] == 32){ //el segundo es espacio y el primero no
-                if(m1[i]>=65 || m1[i]<=90){//MAYÚSCULA
-                    b = toupper(m1[i]);
-                    v_aux[i] = b;
-                }else if(m1[i]>=97 || m1[i]<=122){ //es minúscula
-                    b = tolower(m1[i]);
-                }
-            }else{ //ninguno de los dos es espacio
-                b = "NA";
+    char v_aux[11]; //CREAMOS el vector con las uniones de m1 y m2
+    for(int i=0; i<10; i++){
+        if(m1[i] == 32 && m2[i]!= 32){ //el primero es espacio y el segundo no
+            //miramos si es minuscula o mayuscula
+            if(m2[i]>=65 && m2[i]<=90){//MAYÚSCULA
+                b = tolower(m2[i]);
+                v_aux[i] = b;                   
+                //printf("%c", v_aux[i]);
+            }else if(m2[i]>=97 && m2[i]<=122){ //es minúscula
+                b = toupper(m2[i]);
                 v_aux[i] = b;
+                //printf("%c", v_aux[i]);
+            }
+        }else if(m1[i]!= 32 && m2[i] == 32){ //el segundo es espacio y el primero no
+            if(m1[i]>=65 && m1[i]<=90){//MAYÚSCULA
+                b = tolower(m1[i]);
+                v_aux[i] = b;
+               //printf("%c", v_aux[i]);
+        }else if(m1[i]>=97 && m1[i]<=122){ //es minúscula
+                b = toupper(m1[i]);
+                v_aux[i] = b;
+                //printf("%c", v_aux[i]);
+            }
+        }else if ((m1[i]!=32 && m2[i]!=32) || (m1[i]==32 && m2[i]==32)){ //ninguno de los dos es espacio o los dos son espacio
+            b = '0';
+            v_aux[i] = b;
+            //printf("%c", v_aux[i]);
             }
         }
-        printf(v_aux);
-
-    }
+    printf("%s", v_aux);
+}
 //}
+
+void matriz_con_espacios(unsigned char m1[11], unsigned char m2[11], int len){
+    unsigned int matriz[2][11]; //una matriz de enteros
+    printf("%i", matriz);
+    //la primera fila es para el primer mensaje
+    //la segunda fila es para el segundo mnsj
+    //m1 = 00100000010
+    //m2 = 00000000000
+
+    for(int i = 0; i<2; i++){ //recorremos la fila
+        for(int j=0; j<11; j++){
+            if(m1[j] == 32 && m2[j]!= 32){ ///el primero es espacio y el segundo no
+                matriz[i][j] = matriz[i][j] +1; //sumamos el número de espacio
+            }else if(m1[j] != 32 && m2[j] == 32){ //el primero no es espacio y el segundo si
+                matriz[i][j] = matriz[i][j] +1;
+        }
+    }
+    printf("%i", matriz);
+}
+    
+}
 
 int main() {
 
     int i, j;
-    unsigned char mykey[10] = "abcdefghij"; 
+    //unsigned char mykey[10] = "abcdefghij"; 
 
-    unsigned char mifrase1[10] = "kaixo libe";  
-    unsigned char mifrase2[10] = "aB cd ef g";
+    unsigned char mifrase1[11] = "kaixo libe";  
+    unsigned char mifrase2[11] = "aB cd ef g";
 
     unsigned char c[MSGS][LEN] = {"1a1617451a411517490b061b0f08535404044e17450c1c45326222420a00340006544816170b54030b55020d530046",
         "184f184f0a081a000016071a00010017090b00100416010054530e060c52301b0c000a131304430e0a0640",
@@ -99,8 +125,9 @@ int main() {
         "793b024f48151f0845461f140a444907480b4f074510170601520e4959552a0a5541480f1312000d0a0c4e0141170045541a08065c",
         "163b55530d020317491216551e1645070d0b54004502520b11574b161c54790013000b0917094c0301120b170e",
         "100021000c04000c43031c550d054e54010b43010002010054530e060c52301b0c001e141a0b45140e17070849000100535d",
-        "00000000000000000000000000000000000000000000000000000000000000000000"};
-        // "793b1d451a04560c53460e550d1d42111a4553160616000c00594b161249350306001b0919175407081040"};
+        "793b1d451a04560c53460e550d1d42111a4553160616000c00594b161249350306001b0919175407081040"};
+
+         // "00000000000000000000000000000000000000000000000000000000000000000000"};
     unsigned char aux[MSGS][LEN];
     int len;
     
@@ -120,10 +147,16 @@ int main() {
     }
     
     printf("\n");
-    printf(mifrase1);
+    printf( mifrase1);
     printf("\n");
     printf(mifrase2);
+    printf("\n");
+    printf("Resultado: ");
     tabla_mensajes(mifrase1, mifrase2, 10);
+
+    printf("\n");
+    matriz_con_espacios(mifrase1, mifrase2, 10);
+
 
     return 0;
 }
