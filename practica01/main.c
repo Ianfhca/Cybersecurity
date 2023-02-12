@@ -1,6 +1,4 @@
 #include "include.h"
-#include "ctype.h"
-#include "string.h"
 
 void print_cmsgs(unsigned char c[MSGS][LEN]) {
     int i, j;
@@ -120,10 +118,29 @@ void matriz_con_espacios(unsigned char m1[12], unsigned char m2[12], int len){
     
 }
 
+void uncypher_msgs(unsigned char c[MSGS][LEN], unsigned char key[50], int keylen) {
+    int i, j, k = 0, len;
+
+    for (i = 0; i < MSGS; i++) {
+        len = strlen(c[i]);
+        for (j = 0; j < len; j++) {
+            // printf("%d", k);
+            if (k == keylen) {
+                k = 0;
+            }
+            c[i][j] = key[k] ^ c[i][j];
+            k++;
+            printf("%c", c[i][j]);
+        }
+        k = 0;
+        printf("\n");
+    }
+}
+
 int main() {
 
     int i, j;
-    //unsigned char mykey[10] = "abcdefghij"; 
+    unsigned char key[29] = "You have found the secret key"; 
 
     unsigned char mifrase1[12] = "kaIx o lib e";  
     unsigned char mifrase2[12] = "aB c d e f g";
@@ -142,11 +159,8 @@ int main() {
         "163b55530d020317491216551e1645070d0b54004502520b11574b161c54790013000b0917094c0301120b170e",
         "100021000c04000c43031c550d054e54010b43010002010054530e060c52301b0c001e141a0b45140e17070849000100535d",
         "793b1d451a04560c53460e550d1d42111a4553160616000c00594b161249350306001b0919175407081040"};
-
-         // "00000000000000000000000000000000000000000000000000000000000000000000"};
     unsigned char aux[MSGS][LEN];
-    int len;
-    
+    int len, keylen; 
 
     print_cmsgs(c);
     for (i = 0; i < MSGS; i++) {
@@ -161,6 +175,9 @@ int main() {
         print_hex(aux[i], len);
         printf("\n");
     }
+    
+    keylen = strlen(key);
+    uncypher_msgs(aux, key, keylen);
     
     printf("\n");
     printf( mifrase1);
