@@ -48,10 +48,10 @@ void hex_to_ascii(unsigned char c[LEN], unsigned char aux[LEN], int len) {
 }
 
 //mira si hay espacio entre los mensajes
-void tabla_mensajes(unsigned char m1[10], unsigned char m2[10], int len){
+void tabla_mensajes(unsigned char m1[12], unsigned char m2[12], int len){
     char b;
-    char v_aux[11]; //CREAMOS el vector con las uniones de m1 y m2
-    for(int i=0; i<10; i++){
+    char v_aux[12]; //CREAMOS el vector con las uniones de m1 y m2
+    for(int i=0; i<len; i++){
         if(m1[i] == 32 && m2[i]!= 32){ //el primero es espacio y el segundo no
             //miramos si es minuscula o mayuscula
             if(m2[i]>=65 && m2[i]<=90){//MAYÚSCULA
@@ -83,7 +83,7 @@ void tabla_mensajes(unsigned char m1[10], unsigned char m2[10], int len){
 }
 //}
 
-void matriz_con_espacios(unsigned char m1[10], unsigned char m2[10], int len){
+void matriz_con_espacios(unsigned char m1[12], unsigned char m2[12], int len){
     unsigned int matriz[2][10]; //una matriz de enteros
     //la primera fila es para el primer mensaje
     //la segunda fila es para el segundo mnsj
@@ -92,14 +92,14 @@ void matriz_con_espacios(unsigned char m1[10], unsigned char m2[10], int len){
     //inicializamos la matriz
     int i, j, k, l;
     for( i=0; i<2; i++){
-        for( j = 0; j<11; j++){
+        for( j = 0; j<len; j++){
             matriz[i][j] = 0;
         }
     }
     
     printf("\n");
     for(i= 0; i<2; i++){ //recorremos la fila
-        for(j=0; j<11; j++){
+        for(j=0; j<len; j++){
             if(m1[j] == 32 && m2[j]!= 32){ ///el primero es espacio y el segundo no
                 matriz[i][j] = matriz[i][j] + 1; //sumamos el número de espacio
                 printf("%d", matriz[i][j]);
@@ -112,7 +112,7 @@ void matriz_con_espacios(unsigned char m1[10], unsigned char m2[10], int len){
             }else if(m1[j] != 32 && m2[j] != 32){ //ninguno de los dos es espacio
                 matriz[i][j] = 0;
                 printf("%d", matriz[i][j]);
-            }if(j==10){
+            }if(j==11){
                 printf("\n");
             }
         }  
@@ -125,8 +125,8 @@ int main() {
     int i, j;
     //unsigned char mykey[10] = "abcdefghij"; 
 
-    unsigned char mifrase1[11] = "kaIxo libe";  
-    unsigned char mifrase2[11] = "aB cd ef g";
+    unsigned char mifrase1[12] = "kaIx o lib e";  
+    unsigned char mifrase2[12] = "aB c d e f g";
 
     unsigned char c[MSGS][LEN] = {"1a1617451a411517490b061b0f08535404044e17450c1c45326222420a00340006544816170b54030b55020d530046",
         "184f184f0a081a000016071a00010017090b00100416010054530e060c52301b0c000a131304430e0a0640",
@@ -168,10 +168,11 @@ int main() {
     printf(mifrase2);
     printf("\n");
     printf("Resultado: ");
-    tabla_mensajes(mifrase1, mifrase2, 10);
+    tabla_mensajes(mifrase1, mifrase2, 12);
 
     printf("\n");
-    matriz_con_espacios(mifrase1, mifrase2, 10);
+    
+    matriz_con_espacios(mifrase1, mifrase2, 12);
 
     return 0;
 }
