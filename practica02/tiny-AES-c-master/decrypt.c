@@ -4,6 +4,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <time.h>
+#include <omp.h>
 #include "aes.h"
 
 #define BLOCK_SIZE 16
@@ -90,9 +91,13 @@ void search(int64_t n_key_mask, int64_t *key_mask, int64_t n_plaintext_mask, int
 {	
 	//RELLENA EL CODIGO
     struct AES_ctx ctx;
-    int i, found = 0;
+    int i, found = 0, end = 0;
+    uint8_t aux[AES_KEY_LENGTH];
 
-    while (!found) {
+
+    #pragma omp parallel private (key, plain_text, found, i)
+    {
+    while (!found && !end) {
         AES_init_ctx_iv(&ctx, key, iv); // Inicializa la clave con su IV
         AES_CBC_encrypt_buffer(&ctx, plain_text, BLOCK_SIZE); // Encripta el texto usando CBC
         
@@ -103,12 +108,12 @@ void search(int64_t n_key_mask, int64_t *key_mask, int64_t n_plaintext_mask, int
         // Comparamos el mensaje que ya teníamos cifrado con el que acabamos de cifrar
         if (0 == memcmp((char*) cypher_text, (char*) plain_text, BLOCK_SIZE)) {
             printf("SUCCESS!\n");
+            memcpy((char*)aux, (char*)key, AES_KEY_LENGTH);
             found = 1;
         } else {
             printf("FAILURE!\n");
         }
         // print_hex(plain_text, BLOCK_SIZE);
-
         key[key_mask[n_key_mask-1]] = key[key_mask[n_key_mask-1]] + 1;
         for (i = n_key_mask-1; i >= 0; i--) {
             if (key[key_mask[i]] >= ASCII_RANGE) {
@@ -117,6 +122,10 @@ void search(int64_t n_key_mask, int64_t *key_mask, int64_t n_plaintext_mask, int
             }
         }
     }
+    #pragma omp single
+    end = 1;
+    }
+    printf("Key: %s", aux);
 }
 
 int main(int argc, char *argv[])
