@@ -83,24 +83,40 @@ void tabla_mensajes(unsigned char m1[10], unsigned char m2[10], int len){
 }
 //}
 
-void matriz_con_espacios(unsigned char m1[11], unsigned char m2[11], int len){
-    unsigned int matriz[2][11]; //una matriz de enteros
-    printf("%i", matriz);
+void matriz_con_espacios(unsigned char m1[10], unsigned char m2[10], int len){
+    unsigned int matriz[2][10]; //una matriz de enteros
     //la primera fila es para el primer mensaje
     //la segunda fila es para el segundo mnsj
     //m1 = 00100000010
     //m2 = 00000000000
-
-    for(int i = 0; i<2; i++){ //recorremos la fila
-        for(int j=0; j<11; j++){
-            if(m1[j] == 32 && m2[j]!= 32){ ///el primero es espacio y el segundo no
-                matriz[i][j] = matriz[i][j] +1; //sumamos el número de espacio
-            }else if(m1[j] != 32 && m2[j] == 32){ //el primero no es espacio y el segundo si
-                matriz[i][j] = matriz[i][j] +1;
+    //inicializamos la matriz
+    int i, j, k, l;
+    for( i=0; i<2; i++){
+        for( j = 0; j<11; j++){
+            matriz[i][j] = 0;
         }
     }
-    printf("%i", matriz);
-}
+    
+    printf("\n");
+    for(i= 0; i<2; i++){ //recorremos la fila
+        for(j=0; j<11; j++){
+            if(m1[j] == 32 && m2[j]!= 32){ ///el primero es espacio y el segundo no
+                matriz[i][j] = matriz[i][j] + 1; //sumamos el número de espacio
+                printf("%d", matriz[i][j]);
+            }else if(m1[j] != 32 && m2[j] == 32){ //el primero no es espacio y el segundo si
+                matriz[i][j] = matriz[i][j] + 1;
+                printf("%d", matriz[i][j]);
+            }else if(m1[j] == 32 && m2[j] == 32){ //los dos son espacios
+                matriz[i][j] = 0;
+                printf("%d", matriz[i][j]);
+            }else if(m1[j] != 32 && m2[j] != 32){ //ninguno de los dos es espacio
+                matriz[i][j] = 0;
+                printf("%d", matriz[i][j]);
+            }if(j==10){
+                printf("\n");
+            }
+        }  
+    }
     
 }
 
@@ -109,7 +125,7 @@ int main() {
     int i, j;
     //unsigned char mykey[10] = "abcdefghij"; 
 
-    unsigned char mifrase1[11] = "kaixo libe";  
+    unsigned char mifrase1[11] = "kaIxo libe";  
     unsigned char mifrase2[11] = "aB cd ef g";
 
     unsigned char c[MSGS][LEN] = {"1a1617451a411517490b061b0f08535404044e17450c1c45326222420a00340006544816170b54030b55020d530046",
@@ -156,7 +172,6 @@ int main() {
 
     printf("\n");
     matriz_con_espacios(mifrase1, mifrase2, 10);
-
 
     return 0;
 }
