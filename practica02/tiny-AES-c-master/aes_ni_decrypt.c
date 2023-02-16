@@ -120,6 +120,46 @@ void search(int64_t n_key_mask, int64_t *key_mask, int64_t n_plaintext_mask, int
         }
     }
     printf("Key: %s", aux);
+
+    unsigned int buffer_size = 64;
+	int nbocks = 4;
+	unsigned int i;
+	unsigned char *testVector = (unsigned char*)_alloca(buffer_size);
+	unsigned char *testResult = (unsigned char*)_alloca(buffer_size);
+	unsigned char test_iv[16];
+
+    for (i=0;i<buffer_size;i++)
+	{
+		testVector[i] = test_plain_text[i];
+		testResult[i] = 0xee;
+	}
+
+	memcpy(test_iv, test_init_vector, 16);
+	
+	printf("IV value before the call:%s\n", iv);
+	enc_256_CBC(testVector, testResult, test_key_256, iv, nbocks);
+	printf("IV value after the call: %s\n", test_iv);
+	
+	for (i=0;i<buffer_size;i++)
+	{
+		if (testResult[i] != test_cipher_256_cbc[i])
+		{	
+			printf("AES-CBC-256 Encryption Failed\n");
+		}
+	}
+	
+	memcpy(test_iv,test_init_vector,16);
+	dec_256_CBC(testResult,testVector,test_key_256, test_iv, nbocks);
+
+	for (i=0;i<buffer_size;i++)
+	{
+		if (testVector[i] != test_plain_text[i])
+		{
+			printf("AES-CBC-256 Decryption Failed\n");
+		}
+	}
+
+	printf("AES-CBC-256 Successful\n");
 }
 
 int main(int argc, char *argv[])

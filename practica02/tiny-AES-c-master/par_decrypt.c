@@ -91,10 +91,13 @@ void search(int64_t n_key_mask, int64_t *key_mask, int64_t n_plaintext_mask, int
 {	
 	//RELLENA EL CODIGO
     struct AES_ctx ctx;
-    int i, found = 0;
+    int i, found = 0, end = 0;
     uint8_t aux[AES_KEY_LENGTH];
 
-    while (!found) {
+
+    #pragma omp parallel private (key, plain_text, found, i)
+    {
+    while (!found && !end) {
         AES_init_ctx_iv(&ctx, key, iv); // Inicializa la clave con su IV
         AES_CBC_encrypt_buffer(&ctx, plain_text, BLOCK_SIZE); // Encripta el texto usando CBC
         
@@ -118,6 +121,9 @@ void search(int64_t n_key_mask, int64_t *key_mask, int64_t n_plaintext_mask, int
                 key[key_mask[i-1]] = key[key_mask[i-1]] +1;
             }
         }
+    }
+    #pragma omp single
+    end = 1;
     }
     printf("Key: %s", aux);
 }
