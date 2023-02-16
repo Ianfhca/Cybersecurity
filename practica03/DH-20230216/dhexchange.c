@@ -3,6 +3,8 @@
 #include <inttypes.h>
 #include <stdlib.h>
 #include <memory.h>
+#include <stdio.h>
+#include <string.h>
 
 #ifdef _MSC_VER
 #define INLINE __inline
@@ -194,6 +196,22 @@ void DH_generate_key_pair(DH_KEY public_key, DH_KEY private_key)
 	_powmodp(&public_k, G, private_k);
 
 	memcpy(public_key, public_k.byte, DH_KEY_LENGTH);
+}
+
+/*--------------------------------------------------------------------------*/
+void assign_key(DH_KEY key, unsigned char text[33])
+{
+	char aux[3] = "";
+
+	/* Assign key */
+	int i;
+	for (i = 0; i < DH_KEY_LENGTH; i++) {
+		// aux[0] = text[i*2];
+		// strcat(aux[0], text[i*2 +1]);
+		memcpy(aux, &text[i*2], 2);
+		aux[2]= '\0';
+		key[i] = (unsigned char)strtol(aux, NULL, 16);
+	}
 }
 
 /*--------------------------------------------------------------------------*/

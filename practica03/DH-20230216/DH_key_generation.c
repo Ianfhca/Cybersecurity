@@ -18,37 +18,45 @@ static void _print_key(const char* name, const DH_KEY key)
 
 int main(void)
 {
-	DH_KEY alice_public;
-	DH_KEY alice_private;
-	DH_KEY bob_private;
-	DH_KEY bob_public;
-	DH_KEY alice_secret; 
-	DH_KEY bob_secret;
+	DH_KEY our_public;
+	DH_KEY our_private;
+	DH_KEY other_private;
+	DH_KEY other_public;
+	DH_KEY our_secret; 
+	DH_KEY other_secret;
+
+	unsigned char key[3][33] =  {"870d7253bef3e17be12d9738937531dc",
+							"45451fae9b3a9d5f463ccb756303557c",
+							"ccb1cf316ef3ea8868481472e8385a7e"};
+
+	assign_key(our_public, key[0]);
+	assign_key(our_private, key[1]);
+	assign_key(other_public, key[2]);
 
 	time_t seed;
 	time(&seed);
 	srand((unsigned int)seed);
 
 	/*Alice generate her private key and public key */
-	DH_generate_key_pair(alice_public, alice_private);
+	// DH_generate_key_pair(our_public, our_private);
 
 	/*Bob generate his private key and public key */
-	DH_generate_key_pair(bob_public, bob_private);
+	// DH_generate_key_pair(other_public, other_private);
 
 	/*Bob send his public key to Alice, Alice generate the secret key */
-	DH_generate_key_secret(alice_secret, alice_private, bob_public);
+	DH_generate_key_secret(our_secret, our_private, other_public);
 
 	/*Alice send her public key to Bob, Bob generate the secret key */
-	DH_generate_key_secret(bob_secret, bob_private, alice_public);
+	// DH_generate_key_secret(other_secret, other_private, our_public);
 
-	_print_key("alice_private", alice_private);
-	_print_key("alice_public", alice_public);
-	_print_key("bob_private", bob_private);
-	_print_key("bob_public", bob_public);
-	_print_key("alice_secret", alice_secret);
-	_print_key("bob_secret", bob_secret);
+	_print_key("our_private", our_private);
+	_print_key("our_public", our_public);
+	_print_key("other_private", other_private);
+	_print_key("other_public", other_public);
+	_print_key("our_secret", our_secret);
+	_print_key("other_secret", other_secret);
 
-	if (memcmp(alice_secret, bob_secret, DH_KEY_LENGTH) != 0) 
+	if (memcmp(our_secret, other_secret, DH_KEY_LENGTH) != 0) 
 	{
 		printf("ERROR!\n");
 		return 1;

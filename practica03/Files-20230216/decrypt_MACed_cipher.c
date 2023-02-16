@@ -63,17 +63,17 @@ int main(int argc, char *argv[])
 	//Read hex key input
 	parse(AES_KEYLEN, argv[2], key);
 
-	//Interpret source file iv + c + tag
+	//Interpret source file iv + c + tag 
 	size_c = total_size_m - AES_BLOCKLEN - SHA256_BLOCK_SIZE;
-	memcpy(iv,totalfile, AES_BLOCKLEN);
-	memcpy(c, totalfile + AES_BLOCKLEN, size_c);
-	memcpy(HMAC, totalfile + AES_BLOCKLEN+size_c, SHA256_BLOCK_SIZE);
+	memcpy(iv,totalfile, AES_BLOCKLEN); // desglosa el totalfile para sacar iv
+	memcpy(c, totalfile + AES_BLOCKLEN, size_c); // desglosa el totalfile para sacar c
+	memcpy(HMAC, totalfile + AES_BLOCKLEN+size_c, SHA256_BLOCK_SIZE); // desglosa el totalfile para sacar HMAC
 	printf("Received iv: ");  phex(iv, AES_BLOCKLEN);
 	printf("Received Cipher: "); phex(c, size_c);
 
 	//Decrypt
 	memcpy(m, c, size_c);
-	size_m = test_decrypt_cbc(key, m, size_c,iv);
+	size_m = test_decrypt_cbc(key, m, size_c,iv); // se guarda en "m"
 
 	//Calculate MAC of decrypted message
 	HMAC_SHA256(key, AES_KEYLEN, m, size_m, HMAC2);
