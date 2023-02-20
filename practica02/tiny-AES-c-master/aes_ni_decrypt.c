@@ -6,6 +6,7 @@
 #include <time.h>
 #include <omp.h>
 #include "aes.h"
+#include "iaesni.h"
 
 #define BLOCK_SIZE 16
 #define AES_KEY_LENGTH 32
@@ -90,25 +91,23 @@ uint32_t parse_mask(uint8_t *in, int64_t **key_mask){
 void search(int64_t n_key_mask, int64_t *key_mask, int64_t n_plaintext_mask, int64_t *plaintext_mask, uint8_t *key, uint8_t *plain_text, uint8_t *cypher_text)
 {	
 	//RELLENA EL CODIGO
-    struct AES_ctx ctx;
     int i, found = 0;
-    uint8_t aux[AES_KEY_LENGTH];
+    size_t numBlocks = 1;
+    uint8_t cypher_aux[BLOCK_SIZE];
+    uint8_t iv_aux[BLOCK_SIZE];
 
     while (!found) {
-        AES_init_ctx_iv(&ctx, key, iv); // Inicializa la clave con su IV
-        AES_CBC_encrypt_buffer(&ctx, plain_text, BLOCK_SIZE); // Encripta el texto usando CBC
-        
-        print_hex(key, KEY_LENGTH);
-        // printf("Key: %s", key);
-        // printf("CBC encrypt: ");
+        memcpy(iv_aux, iv, BLOCK_SIZE);
+        intel_AES_enc256_CBC(plain_text, cypher_aux, key, numBlocks, iv_aux);
 
         // Comparamos el mensaje que ya teníamos cifrado con el que acabamos de cifrar
-        if (0 == memcmp((char*) cypher_text, (char*) plain_text, BLOCK_SIZE)) {
+        if (0 == memcmp((char*) cypher_text, (char*) cypher_aux, BLOCK_SIZE)) {
             printf("SUCCESS!\n");
-            memcpy((char*)aux, (char*)key, AES_KEY_LENGTH);
             found = 1;
+            print_hex(key, KEY_LENGTH);
         } else {
-            printf("FAILURE!\n");
+            // printf("FAILURE!\n");
+            // print_hex(key, KEY_LENGTH);
         }
         // print_hex(plain_text, BLOCK_SIZE);
         key[key_mask[n_key_mask-1]] = key[key_mask[n_key_mask-1]] + 1;
@@ -119,47 +118,47 @@ void search(int64_t n_key_mask, int64_t *key_mask, int64_t n_plaintext_mask, int
             }
         }
     }
-    printf("Key: %s", aux);
 
-    unsigned int buffer_size = 64;
-	int nbocks = 4;
-	unsigned int i;
-	unsigned char *testVector = (unsigned char*)_alloca(buffer_size);
-	unsigned char *testResult = (unsigned char*)_alloca(buffer_size);
-	unsigned char test_iv[16];
 
-    for (i=0;i<buffer_size;i++)
-	{
-		testVector[i] = test_plain_text[i];
-		testResult[i] = 0xee;
-	}
+//     unsigned int buffer_size = 64;
+// 	int nbocks = 4;
+// 	unsigned int i;
+// 	unsigned char *testVector = (unsigned char*)_alloca(buffer_size);
+// 	unsigned char *testResult = (unsigned char*)_alloca(buffer_size);
+// 	unsigned char test_iv[16];
 
-	memcpy(test_iv, test_init_vector, 16);
+//     for (i=0;i<buffer_size;i++)
+// 	{
+// 		testVector[i] = test_plain_text[i];
+// 		testResult[i] = 0xee;
+// 	}
+
+// 	memcpy(test_iv, test_init_vector, 16);
 	
-	printf("IV value before the call:%s\n", iv);
-	enc_256_CBC(testVector, testResult, test_key_256, iv, nbocks);
-	printf("IV value after the call: %s\n", test_iv);
+// 	printf("IV value before the call:%s\n", iv);
+// 	enc_256_CBC(testVector, testResult, test_key_256, iv, nbocks);
+// 	printf("IV value after the call: %s\n", test_iv);
 	
-	for (i=0;i<buffer_size;i++)
-	{
-		if (testResult[i] != test_cipher_256_cbc[i])
-		{	
-			printf("AES-CBC-256 Encryption Failed\n");
-		}
-	}
+// 	for (i=0;i<buffer_size;i++)
+// 	{
+// 		if (testResult[i] != test_cipher_256_cbc[i])
+// 		{	
+// 			printf("AES-CBC-256 Encryption Failed\n");
+// 		}
+// 	}
 	
-	memcpy(test_iv,test_init_vector,16);
-	dec_256_CBC(testResult,testVector,test_key_256, test_iv, nbocks);
+// 	memcpy(test_iv,test_init_vector,16);
+// 	dec_256_CBC(testResult,testVector,test_key_256, test_iv, nbocks);
 
-	for (i=0;i<buffer_size;i++)
-	{
-		if (testVector[i] != test_plain_text[i])
-		{
-			printf("AES-CBC-256 Decryption Failed\n");
-		}
-	}
+// 	for (i=0;i<buffer_size;i++)
+// 	{
+// 		if (testVector[i] != test_plain_text[i])
+// 		{
+// 			printf("AES-CBC-256 Decryption Failed\n");
+// 		}
+// 	}
 
-	printf("AES-CBC-256 Successful\n");
+// 	printf("AES-CBC-256 Successful\n");
 }
 
 int main(int argc, char *argv[])
@@ -206,10 +205,3 @@ int main(int argc, char *argv[])
 
     search(n_key_mask, key_mask, n_plaintext_mask, plaintext_mask, key, plain_text, cypher_text);
 }
-
-
-
-
-
-
-
