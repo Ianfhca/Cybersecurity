@@ -21,7 +21,7 @@
 //Declare all functions
 int test_encrypt_cbc(uint8_t* key, uint8_t* buf, int size_buf, uint8_t* iv);
 int test_decrypt_cbc(uint8_t* key, uint8_t* buf, int size_buf, uint8_t* iv);
-void phex(uint8_t* str, int len);
+void phex(uint8_t* str, int len); //printea hexadecimales
 void write_hex_file(FILE* file, uint8_t* in, int size);
 int read_hex_file(FILE* file, uint8_t* out);
 int hex_to_int(char c);
@@ -33,10 +33,10 @@ void HMAC_SHA256(uint8_t* key, int size_k, uint8_t* m, int size_m, uint8_t* HMAC
 
 int main(int argc, char *argv[])
 {
-    	//Initialize variables
-    	uint8_t* totalfile = malloc(MAXLENGTH * sizeof(uint8_t));
-    	uint8_t key[AES_KEYLEN];
-    	uint8_t* iv=malloc(AES_BLOCKLEN * sizeof(uint8_t));
+    //Initialize variables
+    uint8_t* totalfile = malloc(MAXLENGTH * sizeof(uint8_t));
+    uint8_t key[AES_KEYLEN];
+    uint8_t* iv=malloc(AES_BLOCKLEN * sizeof(uint8_t));
 	uint8_t* c = malloc(MAXLENGTH * sizeof(uint8_t));
 	uint8_t* HMAC = malloc(SHA256_BLOCK_SIZE * sizeof(uint8_t));
 	int total_size_m;
@@ -44,7 +44,7 @@ int main(int argc, char *argv[])
 	uint8_t* m = malloc(MAXLENGTH * sizeof(uint8_t));
 	int size_m;
 	uint8_t* HMAC2 = malloc(SHA256_BLOCK_SIZE * sizeof(uint8_t));
-    	FILE *fd_in;
+    FILE *fd_in;
 	    	
 	if(argc != 3)
 	{
@@ -64,7 +64,7 @@ int main(int argc, char *argv[])
 	parse(AES_KEYLEN, argv[2], key);
 
 	//Interpret source file iv + c + tag 
-	size_c = total_size_m - AES_BLOCKLEN - SHA256_BLOCK_SIZE;
+	size_c = total_size_m - AES_BLOCKLEN - SHA256_BLOCK_SIZE; 
 	memcpy(iv,totalfile, AES_BLOCKLEN); // desglosa el totalfile para sacar iv
 	memcpy(c, totalfile + AES_BLOCKLEN, size_c); // desglosa el totalfile para sacar c
 	memcpy(HMAC, totalfile + AES_BLOCKLEN+size_c, SHA256_BLOCK_SIZE); // desglosa el totalfile para sacar HMAC
@@ -90,7 +90,62 @@ int main(int argc, char *argv[])
 
 void HMAC_SHA256(uint8_t* key, int size_k, uint8_t* m, int size_m, uint8_t* HMAC)
 {
-	//FILL THIS FUNCTION
+    int i=0;
+	//primero declaramos ipad y opad
+    unsigned char ipad = 0x36;
+    unsigned char opad = 0x5c;
+
+    //hacemos el padding
+    unsigned char padding1[SHA256_INPUT_SIZE];
+    unsigned char padding2[SHA256_INPUT_SIZE];
+    for(i=0; i< SHA256_INPUT_SIZE; i++){
+        //primero lo ponemos a cero los dos
+        padding1[i] = 0;
+        padding2[i] = 0;
+    }
+
+    //copiamos lo que hay en key a paddin1 y padding2
+    memcpy(padding1, key, size_k);
+    memcpy(padding2, key, size_k);
+    //ahora tenemos la clave key guardada en los paddings
+    //ahora calculamos ipad y opad
+    for(i=0; i< SHA256_BLOCK_SIZE; i++){
+        padding1[i] = padding1[i]^ipad;
+        padding2[i] = padding2[i]^opad;
+    }
+
+    //ahora tenemos que sacar hash1
+    //necesitamos hash1 para sacar hash2, es de 32bytes
+    unsigned char hash1[SHA256_BLOCK_SIZE];
+    //el hash1 = 64 bytes + tamaño del mensaje
+    int tamano_hash1 = SHA256_INPUT_SIZE + size_m;
+    //guardamos espacio de memoria para el hash:
+    unsigned char *h1 = malloc(tamano_hash1);
+    
+
+    //tamaño del hash2 = 64 bytes + h1(que es igual a block size)
+    int tamano_hash2 = SHA256_INPUT_SIZE + SHA256_BLOCK_SIZE;
+    //volvemos a guardar espacio en la memoria
+    unsigned char *h2 = malloc(tamano_hash2);
+
+    //creamos la estructura del hash1
+    //hash1 tiene el ipad y luego el mensaje
+    memcpy(h1, padding1, SHA256_INPUT_SIZE);
+    memcpy(&h1[SHA256_INPUT_SIZE], m, size_m);
+
+    SHA256_CTX ctx;
+    sha256_init(&ctx);
+    sha256_update(&ctx, h1, tamano_hash1);
+    sha256_final(&ctx, hash1);
+
+    //ahora hacemos lo mismo para hash2
+    memcpy(h2, padding2, SHA256_INPUT_SIZE);
+    memcpy(&h2[SHA256_INPUT_SIZE], hash1, tamano_hash1);
+
+    sha256_init(&ctx);
+    sha256_update(&ctx, h2, tamano_hash2);
+    sha256_final(&ctx, HMAC);
+
 }
 
 
@@ -153,16 +208,18 @@ int read_hex_file(FILE* file, uint8_t* out)
     return size;
 }
 
+//devuelve el valor entero del hexadecimal
 int hex_to_int(char c)
 {
-    if (c >= 48 && c <= 57)
-        return c - 48;
-    else if (c >= 97 && c <= 102)
+    if (c >= 48 && c <= 57) //48=0 57=9
+        return c - 48; //devuelve el numero
+    else if (c >= 97 && c <= 102) //97=a 102=f
         return c - 87;
     else
         return c - 55;
 }
 
+//con la fórmula pasa de hexadecimal a ascii
 int hex_to_ascii(char c, char d)
 {
     int high = hex_to_int(c) * 16;
@@ -182,6 +239,7 @@ uint32_t hexdigit_value(uint8_t c)
     return nibble;
 }
 
+//este método mira la longitud de la clave y hace padded_key dependiendo de su longitud
 void parse(uint32_t length, uint8_t *in, uint8_t *out)
 {
     uint32_t i, shift, idx;
