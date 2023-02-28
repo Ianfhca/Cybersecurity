@@ -101,6 +101,8 @@ void HMAC_SHA256(uint8_t* key, int size_k, uint8_t* m, int size_m, uint8_t* HMAC
     for(i=0; i< SHA256_INPUT_SIZE; i++){
         //primero lo ponemos a cero los dos
         padding1[i] = 0;
+    }
+    for(i = 0; i< SHA256_INPUT_SIZE; i++){
         padding2[i] = 0;
     }
 
@@ -109,23 +111,27 @@ void HMAC_SHA256(uint8_t* key, int size_k, uint8_t* m, int size_m, uint8_t* HMAC
     memcpy(padding2, key, size_k);
     //ahora tenemos la clave key guardada en los paddings
     //ahora calculamos ipad y opad
-    for(i=0; i< SHA256_BLOCK_SIZE; i++){
+    for(i=0; i< SHA256_INPUT_SIZE; i++){
         padding1[i] = padding1[i]^ipad;
+        
+    }
+    for(i=0; i< SHA256_INPUT_SIZE; i++){
         padding2[i] = padding2[i]^opad;
     }
 
     //ahora tenemos que sacar hash1
     //necesitamos hash1 para sacar hash2, es de 32bytes
-    unsigned char hash1[SHA256_BLOCK_SIZE];
     //el hash1 = 64 bytes + tamaño del mensaje
-    int tamano_hash1 = SHA256_INPUT_SIZE + size_m;
     //guardamos espacio de memoria para el hash:
+    unsigned char hash1[SHA256_BLOCK_SIZE];
+    int tamano_hash1 = SHA256_INPUT_SIZE + size_m;
     unsigned char *h1 = malloc(tamano_hash1);
     
 
     //tamaño del hash2 = 64 bytes + h1(que es igual a block size)
+   //volvemos a guardar espacio en la memoria
     int tamano_hash2 = SHA256_INPUT_SIZE + SHA256_BLOCK_SIZE;
-    //volvemos a guardar espacio en la memoria
+    
     unsigned char *h2 = malloc(tamano_hash2);
 
     //creamos la estructura del hash1
