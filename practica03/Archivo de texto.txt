@@ -1,0 +1,10 @@
+Pseudocodigo + completar diagrama AES
+Por que algo no es seguro?
+Que hariamos para garantizar la seguridad?
+
+Muchas preguntas sobre las practicas:
+AES - CBC
+Porque ECB no es seguro?
+Que garantiza la seguridad de un algoritmo?
+Porque AES utiliza 10 rondas?
+Entre CBC CTR y ECB cual elegirías y por que?
