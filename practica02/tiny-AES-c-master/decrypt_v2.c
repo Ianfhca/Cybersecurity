@@ -9,6 +9,7 @@
 #include "iaesni.h"
 
 #define BLOCK_SIZE 16
+#define H_BLOCK_SIZE 8
 #define AES_KEY_LENGTH 32
 #define KEY_LENGTH 32 
 #define RANGE 256
@@ -105,16 +106,20 @@ void search(int64_t n_key_mask, int64_t *key_mask, int64_t n_plaintext_mask, int
             printf("SUCCESS!\n");
             found = 1;
             print_hex(key, KEY_LENGTH);
-        } else {
-            // printf("FAILURE!\n");
-            // print_hex(key, KEY_LENGTH);
-        }
-        // print_hex(plain_text, BLOCK_SIZE);
-        key[key_mask[n_key_mask-1]] = key[key_mask[n_key_mask-1]] + 1;
-        for (i = n_key_mask-1; i >= 0; i--) {
-            if (key[key_mask[i]] >= ASCII_RANGE) {
-                key[key_mask[i]] = 0;
-                key[key_mask[i-1]] = key[key_mask[i-1]] +1;
+            print_hex(cypher_aux, BLOCK_SIZE);
+        }         
+        // key[key_mask[n_key_mask-1]] = key[key_mask[n_key_mask-1]] + 1;
+        // for (i = n_key_mask-1; i >= 0; i--) {
+        //     if (key[key_mask[i]] >= ASCII_RANGE) {
+        //         key[key_mask[i]] = 0;
+        //         key[key_mask[i-1]] = key[key_mask[i-1]] +1;
+        //     }
+        // }
+        plain_text[plaintext_mask[n_plaintext_mask-1]] = plain_text[plaintext_mask[n_plaintext_mask-1]] + 1;
+        for (i = n_plaintext_mask-1; i >= 0; i--) {
+            if (plain_text[plaintext_mask[i]] >= ASCII_RANGE) {
+                plain_text[plaintext_mask[i]] = 0;
+                plain_text[plaintext_mask[i-1]] = plain_text[plaintext_mask[i-1]] +1;
             }
         }
     }
