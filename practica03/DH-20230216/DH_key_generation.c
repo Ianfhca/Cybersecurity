@@ -4,6 +4,7 @@
 #include <memory.h>
 #include "dhexchange.h"
 
+
 static void _print_key(const char* name, const DH_KEY key) 
 {
 	int i;
@@ -24,6 +25,7 @@ int main(void)
 	DH_KEY other_public;
 	DH_KEY our_secret; 
 	DH_KEY other_secret;
+	
 
 	unsigned char key[3][33] =  {"870d7253bef3e17be12d9738937531dc",
 							"45451fae9b3a9d5f463ccb756303557c",
@@ -46,6 +48,7 @@ int main(void)
 	/*Bob send his public key to Alice, Alice generate the secret key */
 	DH_generate_key_secret(our_secret, our_private, other_public);
 
+
 	/*Alice send her public key to Bob, Bob generate the secret key */
 	// DH_generate_key_secret(other_secret, other_private, our_public);
 
@@ -54,8 +57,9 @@ int main(void)
 	_print_key("other_private", other_private);
 	_print_key("other_public", other_public);
 	_print_key("our_secret", our_secret);
-	_print_key("other_secret", other_secret);
+	_print_key("other_secret", our_secret);
 
+	
 	if (memcmp(our_secret, other_secret, DH_KEY_LENGTH) != 0) 
 	{
 		printf("ERROR!\n");

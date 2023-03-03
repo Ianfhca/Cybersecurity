@@ -16,10 +16,10 @@ int main(int argc, char *argv[])
 	uint8_t enc_text[AES_BLOCKLEN];
 	FILE *fd_in, *fd_out;
 	
-    	uint32_t total_bytes = 0;
-    	uint64_t size;
+    uint32_t total_bytes = 0;
+    uint64_t size;
 	uint8_t padding;
-    	uint32_t read_bytes;
+    uint32_t read_bytes;
 
 	
 	if(argc != 4)
